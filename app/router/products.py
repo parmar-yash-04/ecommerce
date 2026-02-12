@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from app.database import get_db
 from app.schemas import ProductCreate, ProductResponse, VariantCreate, VariantResponse, ProductWithVariants
@@ -8,7 +8,7 @@ from typing import List
 
 router = APIRouter(prefix="/products", tags=["Products"])
 
-@router.post("/", response_model=ProductResponse)
+@router.post("/", response_model=ProductResponse, status_code=status.HTTP_201_CREATED)
 def create_product(
     data: ProductCreate,
     db: Session = Depends(get_db),
@@ -33,7 +33,7 @@ def get_product(product_id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Product not found")
     return product
 
-@router.post("/variants", response_model=VariantResponse)
+@router.post("/variants", response_model=VariantResponse, status_code=status.HTTP_201_CREATED)
 def create_variant(
     data: VariantCreate,
     db: Session = Depends(get_db),
@@ -44,7 +44,7 @@ def create_variant(
     ).first()
 
     if not product:
-        raise HTTPException(404, "Product not found")
+        raise HTTPException(status_code=404, detail="Product not found")
 
     variant = ProductVariant(**data.model_dump())
 

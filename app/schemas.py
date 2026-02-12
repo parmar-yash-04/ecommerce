@@ -1,17 +1,17 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, EmailStr
 from typing import Optional, List
 from datetime import datetime
 
 class UserCreate(BaseModel):
     username: str
-    email: str
+    email: EmailStr
     phone_number: str
     password: str
 
 class UserResponse(BaseModel):
     user_id: int
     username: str
-    email: str
+    email: EmailStr
     phone_number: str
     is_verified: bool
 
@@ -80,6 +80,10 @@ class CartResponse(BaseModel):
 
     class Config:
         from_attributes = True
+
+class login(BaseModel):
+    email: EmailStr
+    password: str
 
 class Token(BaseModel):
     access_token: str
