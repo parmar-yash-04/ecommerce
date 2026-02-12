@@ -81,6 +81,24 @@ class CartResponse(BaseModel):
     class Config:
         from_attributes = True
 
+class WishlistAddRequest(BaseModel):
+    product_id: int
+
+class WishlistItemResponse(BaseModel):
+    wishlist_item_id: int
+    product_id: int
+    added_at: datetime
+
+    class Config:
+        from_attributes = True
+
+class WishlistResponse(BaseModel):
+    wishlist_id: int
+    items: List[WishlistItemResponse]
+
+    class Config:
+        from_attributes = True
+
 class login(BaseModel):
     email: EmailStr
     password: str
