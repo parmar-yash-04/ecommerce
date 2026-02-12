@@ -106,6 +106,31 @@ class OTPVerifyRequest(BaseModel):
     email: str
     otp: str
 
+class CheckoutRequest(BaseModel):
+    email: str
+    otp: str
+    shipping_address: str
+
+class OrderItemResponse(BaseModel):
+    variant_id: int
+    quantity: int
+    price_each: float
+    subtotal: float
+
+    class Config:
+        from_attributes = True
+
+class OrderResponse(BaseModel):
+    order_id: int
+    order_number: str
+    total_amount: float
+    order_status: str
+    created_at: datetime
+    items: List[OrderItemResponse]
+
+    class Config:
+        from_attributes = True
+
 class login(BaseModel):
     email: EmailStr
     password: str
