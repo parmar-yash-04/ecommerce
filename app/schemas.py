@@ -99,6 +99,13 @@ class WishlistResponse(BaseModel):
     class Config:
         from_attributes = True
 
+class OTPSendRequest(BaseModel):
+    email: str
+
+class OTPVerifyRequest(BaseModel):
+    email: str
+    otp: str
+
 class login(BaseModel):
     email: EmailStr
     password: str
