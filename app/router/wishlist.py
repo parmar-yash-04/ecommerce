@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from app.database import get_db
 from app.models import Product, WishlistItem, Wishlist
@@ -58,7 +58,7 @@ def view_wishlist(
     wl = get_or_create_wishlist(db, user.user_id)
     return wl
 
-@router.delete("/remove/{wishlist_item_id}")
+@router.delete("/remove/{wishlist_item_id}", status_code=status.HTTP_204_NO_CONTENT)
 def remove_from_wishlist(
     wishlist_item_id: int,
     db: Session = Depends(get_db),

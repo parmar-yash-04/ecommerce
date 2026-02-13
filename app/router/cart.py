@@ -25,13 +25,20 @@ def add_to_cart(
     data: CartAddRequest,
     db: Session = Depends(get_db),
     user = Depends(get_current_user)
-):
+    ):
+
     variant = db.query(ProductVariant).filter(
         ProductVariant.variant_id == data.variant_id
     ).first()
 
     if not variant:
         raise HTTPException(status_code=404, detail="Variant not found")
+
+    if data.quantity <= 0:
+        raise HTTPException(status_code=400, detail="Quantity must be greater than 0")
+
+    if data.quantity > variant.stock_qty:
+        raise HTTPException(status_code=400, detail="Not enough stock available")
 
     cart = get_or_create_cart(db, user.user_id)
 
@@ -68,12 +75,15 @@ def update_quantity(
     db: Session = Depends(get_db),
     user = Depends(get_current_user)
 ):
-    item = db.query(CartItem).filter(
-        CartItem.cart_item_id == data.cart_item_id
+    item = db.query(CartItem).join(Cart).filter(
+    CartItem.cart_item_id == data.cart_item_id,
+    Cart.user_id == user.user_id
     ).first()
 
     if not item:
         raise HTTPException(status_code=404, detail="Cart item not found")
+
+    cart_id = item.cart_id
 
     if data.quantity <= 0:
         db.delete(item)
@@ -81,11 +91,7 @@ def update_quantity(
         item.quantity = data.quantity
 
     db.commit()
-
-    cart = db.query(Cart).filter(
-        Cart.cart_id == item.cart_id
-    ).first()
-
+    cart = db.query(Cart).filter(Cart.cart_id == cart_id).first()
     return cart
 
 @router.delete("/remove/{cart_item_id}", status_code=status.HTTP_204_NO_CONTENT)
@@ -94,8 +100,9 @@ def remove_item(
     db: Session = Depends(get_db),
     user = Depends(get_current_user)
 ):
-    item = db.query(CartItem).filter(
-        CartItem.cart_item_id == cart_item_id
+    item = db.query(CartItem).join(Cart).filter(
+    CartItem.cart_item_id == cart_item_id,
+    Cart.user_id == user.user_id
     ).first()
 
     if not item:
@@ -104,4 +111,4 @@ def remove_item(
     db.delete(item)
     db.commit()
 
-    return {"message": "Item removed"}
+    return {"Item removed from cart"}

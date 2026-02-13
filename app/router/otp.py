@@ -24,7 +24,6 @@ def send_otp(
     db.add(record)
     db.commit()
 
-    # demo return (alert popup)
     return {
         "message": "OTP generated",
         "otp": otp

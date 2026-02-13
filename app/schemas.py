@@ -18,7 +18,7 @@ class UserResponse(BaseModel):
     class Config:
         from_attributes = True
 
-class ProductBase(BaseModel):
+class ProductCreate(BaseModel):
     brand: str
     model_name: str
     description: Optional[str] = None
@@ -26,11 +26,14 @@ class ProductBase(BaseModel):
     image_url: Optional[str] = None
     is_active: bool = True
 
-class ProductCreate(ProductBase):
-    pass
-
-class ProductResponse(ProductBase):
+class ProductResponse(BaseModel):
     product_id: int
+    brand: str
+    model_name: str
+    description: Optional[str] = None
+    base_price: float
+    image_url: Optional[str] = None
+    is_active: bool = True
     created_at: datetime
 
     class Config:
@@ -54,8 +57,12 @@ class VariantResponse(VariantBase):
     class Config:
         from_attributes = True
 
-class ProductWithVariants(ProductResponse):
-    variants: List[VariantResponse] = []
+class ProductWithVariants(BaseModel):
+    model_name: str
+    variants: List[VariantResponse]
+
+    class Config:
+        from_attributes = True
 
 class CartAddRequest(BaseModel):
     variant_id: int
@@ -69,7 +76,6 @@ class CartItemResponse(BaseModel):
     cart_item_id: int
     variant_id: int
     quantity: int
-    added_at: datetime
 
     class Config:
         from_attributes = True
@@ -87,7 +93,6 @@ class WishlistAddRequest(BaseModel):
 class WishlistItemResponse(BaseModel):
     wishlist_item_id: int
     product_id: int
-    added_at: datetime
 
     class Config:
         from_attributes = True
@@ -100,14 +105,14 @@ class WishlistResponse(BaseModel):
         from_attributes = True
 
 class OTPSendRequest(BaseModel):
-    email: str
+    email: EmailStr
 
 class OTPVerifyRequest(BaseModel):
-    email: str
+    email: EmailStr
     otp: str
 
 class CheckoutRequest(BaseModel):
-    email: str
+    email: EmailStr
     otp: str
     shipping_address: str
 
