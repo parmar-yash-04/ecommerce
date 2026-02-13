@@ -90,9 +90,20 @@ class CartResponse(BaseModel):
 class WishlistAddRequest(BaseModel):
     product_id: int
 
+class WishlistProductInfo(BaseModel):
+    product_id: int
+    model_name: str
+    brand: str
+    base_price: float
+    image_url: str
+
+    class Config:
+        from_attributes = True
+
 class WishlistItemResponse(BaseModel):
     wishlist_item_id: int
-    product_id: int
+    # product_id: int
+    product: WishlistProductInfo
 
     class Config:
         from_attributes = True

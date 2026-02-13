@@ -32,11 +32,10 @@ def place_order(
     db: Session = Depends(get_db),
     user = Depends(get_current_user)
 ):
-    # ---------- OTP CHECK ----------
+
     if not verify_otp(db, data.email, data.otp):
         raise HTTPException(400, "OTP invalid or expired")
 
-    # ---------- GET USER CART ----------
     cart = db.query(Cart).filter(
         Cart.user_id == user.user_id
     ).first()
@@ -44,7 +43,6 @@ def place_order(
     if not cart or not cart.items:
         raise HTTPException(400, "Cart is empty")
 
-    # ---------- CREATE ORDER ----------
     order = Order(
         user_id=user.user_id,
         order_number=str(uuid.uuid4())[:8],
@@ -60,7 +58,6 @@ def place_order(
 
     total = 0
 
-    # ---------- MOVE CART → ORDER ITEMS ----------
     for item in cart.items:
 
         variant = db.query(ProductVariant).filter(
@@ -94,7 +91,6 @@ def place_order(
 
     order.total_amount = total
 
-    # ---------- CLEAR CART ----------
     db.query(CartItem).filter(
         CartItem.cart_id == cart.cart_id
     ).delete()
@@ -103,7 +99,7 @@ def place_order(
     receipt = Receipt(
         order_id=order.order_id,
         invoice_number="INV-" + str(uuid.uuid4())[:6],
-        pdf_url=""  # later if you generate pdf
+        pdf_url=""
     )
 
     db.add(receipt)

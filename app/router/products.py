@@ -15,11 +15,9 @@ def create_product(
     user = Depends(get_current_user)
 ):
     product = Product(**data.model_dump())
-
     db.add(product)
     db.commit()
     db.refresh(product)
-
     return product
 
 @router.get("/", response_model=List[ProductResponse])
@@ -45,6 +43,15 @@ def create_variant(
 
     if not product:
         raise HTTPException(status_code=404, detail="Product not found")
+
+    existing = db.query(ProductVariant).filter(
+    ProductVariant.sku_code == data.sku_code).first()
+
+    if existing:
+        raise HTTPException(
+            status_code=400,
+            detail="sku_code already exists"
+        )
 
     variant = ProductVariant(**data.model_dump())
 

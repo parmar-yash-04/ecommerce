@@ -62,6 +62,7 @@ class CartItem(Base):
     quantity = Column(Integer, default=1)
     added_at = Column(TIMESTAMP, default=datetime.utcnow)
     cart = relationship("Cart", back_populates="items")
+    variant = relationship("ProductVariant")
 
 class Wishlist(Base):
     __tablename__ = "wishlists"
@@ -80,6 +81,7 @@ class WishlistItem(Base):
     product_id = Column(Integer, ForeignKey("products.product_id"))
     added_at = Column(TIMESTAMP, default=datetime.utcnow)
     wishlist = relationship("Wishlist", back_populates="items")
+    product = relationship("Product")
 
 class Order(Base):
     __tablename__ = "orders"
