@@ -42,6 +42,7 @@ class ProductVariant(Base):
     price = Column(Float)
     stock_qty = Column(Integer)
     sku_code = Column(String, unique=True)
+    image_url = Column(String)
     product = relationship("Product", back_populates="variants")
 
 class Cart(Base):

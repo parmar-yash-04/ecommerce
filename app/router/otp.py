@@ -46,7 +46,4 @@ def verify_otp(
     if record.expires_at < datetime.utcnow():
         raise HTTPException(400, "OTP expired")
 
-    record.is_used = True
-    db.commit()
-
     return {"message": "OTP verified"}

@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException, status
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 from app.database import get_db
 from app.models import Cart, CartItem, ProductVariant
 from app.schemas import CartAddRequest, CartResponse, CartItemResponse, CartUpdateRequest
@@ -58,16 +58,49 @@ def add_to_cart(
         db.add(item)
 
     db.commit()
-    db.refresh(cart)
-    return cart
+    # Reload cart with relationships
+    cart = db.query(Cart).filter(
+        Cart.cart_id == cart.cart_id
+    ).options(
+        joinedload(Cart.items)
+        .joinedload(CartItem.variant)
+        .joinedload(ProductVariant.product)
+    ).first()
+    
+    # Convert cart items to include product details
+    cart_data = {
+        "cart_id": cart.cart_id,
+        "items": [CartItemResponse.from_db(item) for item in cart.items]
+    }
+    
+    return cart_data
 
 @router.get("/", response_model=CartResponse)
 def view_cart(
     db: Session = Depends(get_db),
     user = Depends(get_current_user)
 ):
-    cart = get_or_create_cart(db, user.user_id)
-    return cart
+    cart = db.query(Cart).filter(
+        Cart.user_id == user.user_id
+    ).options(
+        joinedload(Cart.items)
+        .joinedload(CartItem.variant)
+        .joinedload(ProductVariant.product)
+    ).first()
+    
+    if not cart:
+        cart = Cart(user_id=user.user_id)
+        db.add(cart)
+        db.commit()
+        db.refresh(cart)
+    
+    # Convert cart items to include product details
+    cart_data = {
+        "cart_id": cart.cart_id,
+        "items": [CartItemResponse.from_db(item) for item in cart.items]
+    }
+    
+    return cart_data
 
 @router.put("/update", response_model=CartResponse, status_code=status.HTTP_201_CREATED)
 def update_quantity(
@@ -91,8 +124,23 @@ def update_quantity(
         item.quantity = data.quantity
 
     db.commit()
-    cart = db.query(Cart).filter(Cart.cart_id == cart_id).first()
-    return cart
+    
+    # Reload cart with relationships
+    cart = db.query(Cart).filter(
+        Cart.cart_id == cart_id
+    ).options(
+        joinedload(Cart.items)
+        .joinedload(CartItem.variant)
+        .joinedload(ProductVariant.product)
+    ).first()
+    
+    # Convert cart items to include product details
+    cart_data = {
+        "cart_id": cart.cart_id,
+        "items": [CartItemResponse.from_db(item) for item in cart.items]
+    }
+    
+    return cart_data
 
 @router.delete("/remove/{cart_item_id}", status_code=status.HTTP_204_NO_CONTENT)
 def remove_item(
