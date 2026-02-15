@@ -13,7 +13,7 @@ services:
           property: connectionString
 
       - key: SECRET_KEY
-        sync: false
+        generateValue: true
 
       - key: ALGORITHM
         value: HS256
