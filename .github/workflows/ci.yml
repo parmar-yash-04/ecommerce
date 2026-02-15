@@ -32,10 +32,10 @@ jobs:
       run: |
         pytest test/ -v --tb=short
       env:
-        DATABASE_URL: ${ { secrets.DATABASE_URL } }
-        SECRET_KEY: ${ { secrets.SECRET_KEY } }
-        ALGORITHM: ${ { secrets.ALGORITHM } }
-        ACCESS_TOKEN_EXPIRE_MINUTES: ${ { secrets.ACCESS_TOKEN_EXPIRE_MINUTES } }
+        DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        SECRET_KEY: ${{ secrets.SECRET_KEY }}
+        ALGORITHM: ${{ secrets.ALGORITHM }}
+        ACCESS_TOKEN_EXPIRE_MINUTES: ${{ secrets.ACCESS_TOKEN_EXPIRE_MINUTES }}
     
     - name: Generate coverage report
       if: matrix.python-version == '3.12'
