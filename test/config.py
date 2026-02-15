@@ -1,0 +1,11 @@
+import os
+
+DATABASE_URL = "sqlite:///./test.db"
+SECRET_KEY = "test-secret-key"
+ALGORITHM = "HS256"
+ACCESS_TOKEN_EXPIRE_MINUTES = 30
+
+os.environ["DATABASE_URL"] = DATABASE_URL
+os.environ["SECRET_KEY"] = SECRET_KEY
+os.environ["ALGORITHM"] = ALGORITHM
+os.environ["ACCESS_TOKEN_EXPIRE_MINUTES"] = str(ACCESS_TOKEN_EXPIRE_MINUTES)
