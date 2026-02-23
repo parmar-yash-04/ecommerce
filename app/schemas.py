@@ -25,6 +25,7 @@ class ProductCreate(BaseModel):
     base_price: float
     image_url: Optional[str] = None
     is_active: bool = True
+    tag_ids: List[int] = []
 
 class ProductResponse(BaseModel):
     product_id: int
@@ -176,3 +177,20 @@ class login(BaseModel):
 class Token(BaseModel):
     access_token: str
     token_type: str
+
+class CheckoutResponse(BaseModel):
+    order: OrderResponse
+    payment_link_url: Optional[str] = None
+
+    class Config:
+        from_attributes = True
+
+class TagCreate(BaseModel):
+    name: str
+
+class TagResponse(BaseModel):
+    tag_id: int
+    name: str
+
+    class Config:
+        from_attributes = True

@@ -4,8 +4,9 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from app.database import get_db
 from app.models import Cart, CartItem, ProductVariant, Order, OrderItem, Receipt, OTPVerification
-from app.schemas import CheckoutRequest, OrderResponse
+from app.schemas import CheckoutRequest, OrderResponse, CheckoutResponse
 from app.oauth2 import get_current_user
+from app.config import settings
 
 router = APIRouter(prefix="/checkout", tags=["Checkout"])
 
@@ -13,7 +14,7 @@ def verify_otp(db: Session, email: str, otp: str):
     rec = db.query(OTPVerification).filter(
         OTPVerification.email == email,
         OTPVerification.otp_code == otp,
-        OTPVerification.is_used == False
+        OTPVerification.is_used == True
     ).order_by(OTPVerification.created_at.desc()).first()
 
     if not rec:
@@ -26,15 +27,16 @@ def verify_otp(db: Session, email: str, otp: str):
     db.commit()
     return True
 
-@router.post("/place-order", response_model=OrderResponse)
+@router.post("/place-order", response_model=CheckoutResponse)
 def place_order(
     data: CheckoutRequest,
     db: Session = Depends(get_db),
     user = Depends(get_current_user)
 ):
 
-    if not verify_otp(db, data.email, data.otp):
-        raise HTTPException(400, "OTP invalid or expired")
+    if data.otp:
+        if not verify_otp(db, data.email, data.otp):
+            raise HTTPException(400, "OTP invalid or expired")
 
     cart = db.query(Cart).filter(
         Cart.user_id == user.user_id
@@ -95,7 +97,6 @@ def place_order(
         CartItem.cart_id == cart.cart_id
     ).delete()
 
-    # ---------- CREATE RECEIPT ----------
     receipt = Receipt(
         order_id=order.order_id,
         invoice_number="INV-" + str(uuid.uuid4())[:6],
@@ -103,11 +104,13 @@ def place_order(
     )
 
     db.add(receipt)
-
     db.commit()
     db.refresh(order)
 
-    return order
+    return {
+        "order": order,
+        "payment_link_url": None
+    }
 
 @router.get("/my-orders", response_model=list[OrderResponse])
 def my_orders(

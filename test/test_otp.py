@@ -11,9 +11,7 @@ def test_send_otp_success(client):
     assert response.status_code == status.HTTP_200_OK
     data = response.json()
     assert "message" in data
-    assert "otp" in data
-    assert len(data["otp"]) == 6
-    assert data["otp"].isdigit()
+    assert data["message"] == "OTP sent to your email"
 
 def test_send_otp_invalid_email(client):
     otp_data = {
@@ -26,30 +24,39 @@ def test_send_otp_missing_email(client):
     response = client.post("/otp/send", json={})
     assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
 
-def test_send_multiple_otps(client):
+def test_send_multiple_otps(client, db_session):
     otp_data = {
         "email": "test@example.com"
     }
     response1 = client.post("/otp/send", json=otp_data)
     assert response1.status_code == status.HTTP_200_OK
-    otp1 = response1.json()["otp"]
+    
+    otp1 = db_session.query(OTPVerification).filter(
+        OTPVerification.email == "test@example.com"
+    ).order_by(OTPVerification.created_at.desc()).first()
     
     response2 = client.post("/otp/send", json=otp_data)
     assert response2.status_code == status.HTTP_200_OK
-    otp2 = response2.json()["otp"]
     
-    assert otp1 != otp2
+    otp2 = db_session.query(OTPVerification).filter(
+        OTPVerification.email == "test@example.com"
+    ).order_by(OTPVerification.created_at.desc()).first()
+    
+    assert otp1.otp_code != otp2.otp_code
 
-def test_verify_otp_success(client):
+def test_verify_otp_success(client, db_session):
     otp_data = {
         "email": "test@example.com"
     }
-    send_response = client.post("/otp/send", json=otp_data)
-    otp_code = send_response.json()["otp"]
+    client.post("/otp/send", json=otp_data)
+    
+    otp_record = db_session.query(OTPVerification).filter(
+        OTPVerification.email == "test@example.com"
+    ).order_by(OTPVerification.created_at.desc()).first()
     
     verify_data = {
         "email": "test@example.com",
-        "otp": otp_code
+        "otp": otp_record.otp_code
     }
     response = client.post("/otp/verify", json=verify_data)
     assert response.status_code == status.HTTP_200_OK
@@ -69,16 +76,19 @@ def test_verify_otp_invalid_code(client):
     assert response.status_code == status.HTTP_400_BAD_REQUEST
     assert response.json()["detail"] == "Invalid OTP"
 
-def test_verify_otp_wrong_email(client):
+def test_verify_otp_wrong_email(client, db_session):
     otp_data = {
         "email": "test@example.com"
     }
-    send_response = client.post("/otp/send", json=otp_data)
-    otp_code = send_response.json()["otp"]
+    client.post("/otp/send", json=otp_data)
+    
+    otp_record = db_session.query(OTPVerification).filter(
+        OTPVerification.email == "test@example.com"
+    ).order_by(OTPVerification.created_at.desc()).first()
     
     verify_data = {
         "email": "wrong@example.com",
-        "otp": otp_code
+        "otp": otp_record.otp_code
     }
     response = client.post("/otp/verify", json=verify_data)
     assert response.status_code == status.HTTP_400_BAD_REQUEST
@@ -118,3 +128,25 @@ def test_verify_otp_missing_code(client):
     }
     response = client.post("/otp/verify", json=verify_data)
     assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
+
+def test_verify_otp_one_time_use(client, db_session):
+    otp_data = {
+        "email": "test@example.com"
+    }
+    client.post("/otp/send", json=otp_data)
+    
+    otp_record = db_session.query(OTPVerification).filter(
+        OTPVerification.email == "test@example.com"
+    ).order_by(OTPVerification.created_at.desc()).first()
+    
+    verify_data = {
+        "email": "test@example.com",
+        "otp": otp_record.otp_code
+    }
+    
+    response1 = client.post("/otp/verify", json=verify_data)
+    assert response1.status_code == status.HTTP_200_OK
+    
+    response2 = client.post("/otp/verify", json=verify_data)
+    assert response2.status_code == status.HTTP_400_BAD_REQUEST
+    assert response2.json()["detail"] == "Invalid OTP"

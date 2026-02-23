@@ -5,7 +5,11 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from app.database import get_db, Base
 from main import app
-from app.models import User, Product, ProductVariant
+from app.models import (
+    User, Product, ProductVariant, Cart, CartItem, 
+    Wishlist, WishlistItem, Order, OrderItem, 
+    OTPVerification, Receipt
+)
 from app.utils import hash_password
 from app.oauth2 import create_access_token
 
@@ -23,8 +27,11 @@ def db_session():
     try:
         yield db
     finally:
+        db.rollback()
         db.close()
-        Base.metadata.drop_all(bind=engine)
+        for table in reversed(Base.metadata.sorted_tables):
+            table.drop(bind=engine)
+        Base.metadata.create_all(bind=engine)
 
 @pytest.fixture(scope="function")
 def client(db_session):

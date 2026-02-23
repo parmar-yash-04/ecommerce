@@ -1,9 +1,11 @@
 import random
+import traceback
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from app.database import get_db
 from app.models import OTPVerification
 from app.schemas import OTPSendRequest, OTPVerifyRequest
+from app.utils import send_email
 from datetime import datetime, timedelta
 
 router = APIRouter(prefix="/otp", tags=["OTP"])
@@ -18,15 +20,20 @@ def send_otp(
     record = OTPVerification(
         email=data.email,
         otp_code=otp,
-        expires_at=datetime.utcnow() + timedelta(minutes=5)
+        expires_at=datetime.utcnow() + timedelta(minutes=2)
     )
 
     db.add(record)
     db.commit()
 
+    try:
+        send_email(data.email, otp)
+    except Exception as e:
+        print(f"Failed to send email: {e}")
+        print(traceback.format_exc())
+
     return {
-        "message": "OTP generated",
-        "otp": otp
+        "message": "OTP sent to your email"
     }
 
 @router.post("/verify")
@@ -45,5 +52,8 @@ def verify_otp(
 
     if record.expires_at < datetime.utcnow():
         raise HTTPException(400, "OTP expired")
+
+    record.is_used = True
+    db.commit()
 
     return {"message": "OTP verified"}

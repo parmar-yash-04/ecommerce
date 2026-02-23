@@ -38,15 +38,20 @@ def test_create_product_missing_fields(client, auth_headers):
 def test_list_products_empty(client):
     response = client.get("/products/")
     assert response.status_code == status.HTTP_200_OK
-    assert response.json() == []
+    data = response.json()
+    assert data["total"] == 0
+    assert data["page"] == 1
+    assert data["size"] == 10
+    assert data["total_pages"] == 0
+    assert data["data"] == []
 
 def test_list_products(client, test_product):
     response = client.get("/products/")
     assert response.status_code == status.HTTP_200_OK
     data = response.json()
-    assert len(data) == 1
-    assert data[0]["product_id"] == test_product.product_id
-    assert data[0]["brand"] == test_product.brand
+    assert len(data["data"]) == 1
+    assert data["data"][0]["product_id"] == test_product.product_id
+    assert data["data"][0]["brand"] == test_product.brand
 
 def test_get_product_success(client, test_product):
     response = client.get(f"/products/{test_product.product_id}")

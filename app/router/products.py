@@ -1,8 +1,8 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, Query
 from sqlalchemy.orm import Session
 from app.database import get_db
 from app.schemas import ProductCreate, ProductResponse, VariantCreate, VariantResponse, ProductWithVariants
-from app.models import Product, ProductVariant
+from app.models import Product, ProductVariant, Tag
 from app.oauth2 import get_current_user
 from typing import List
 
@@ -14,15 +14,41 @@ def create_product(
     db: Session = Depends(get_db),
     user = Depends(get_current_user)
 ):
-    product = Product(**data.model_dump())
+    product = Product(
+    brand=data.brand,
+    model_name=data.model_name,
+    description=data.description,
+    base_price=data.base_price,
+    image_url=data.image_url,
+    is_active=data.is_active
+)
+    if data.tag_ids:
+        tags = db.query(Tag).filter(Tag.tag_id.in_(data.tag_ids)).all()
+        product.tags = tags
     db.add(product)
     db.commit()
     db.refresh(product)
     return product
 
-@router.get("/", response_model=List[ProductResponse])
-def list_products(db: Session = Depends(get_db)):
-    return db.query(Product).filter(Product.is_active == True).all()
+@router.get("/")
+def list_products(
+    page: int = Query(1, ge=1),
+    size: int = Query(10, le=50),
+    db: Session = Depends(get_db)
+):
+    offset = (page - 1) * size
+    query = db.query(Product).filter(Product.is_active == True)
+    total_products = query.count()
+    total_pages = (total_products + size - 1) // size
+    products = query.offset(offset).limit(size).all()
+
+    return {
+        "total": total_products,
+        "page": page,
+        "size": size,
+        "total_pages": total_pages,
+        "data": products
+    }
 
 @router.get("/{product_id}", response_model=ProductResponse)
 def get_product(product_id: int, db: Session = Depends(get_db)):

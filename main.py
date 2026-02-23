@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from app.router import users, auth, products, cart, wishlist, otp, checkout, orders
+from app.router import users, auth, products, cart, wishlist, otp, checkout, orders, google_auth, recentview, tags
 from app.database import engine, Base
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -23,3 +23,6 @@ app.include_router(wishlist.router)
 app.include_router(otp.router)
 app.include_router(checkout.router)
 app.include_router(orders.router)
+app.include_router(google_auth.router)
+app.include_router(recentview.router)
+app.include_router(tags.router)

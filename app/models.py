@@ -1,8 +1,15 @@
-from sqlalchemy import Column, Integer, String, ForeignKey, Boolean, Text, Float
+from sqlalchemy import Column, Integer, String, ForeignKey, Boolean, Text, Float, Table
 from sqlalchemy.sql.sqltypes import TIMESTAMP
 from sqlalchemy.orm import relationship
-from .database import Base
+from app.database import Base
 from datetime import datetime
+
+product_tags = Table(
+    'product_tags',
+    Base.metadata,
+    Column('product_id', Integer, ForeignKey('products.product_id')),
+    Column('tag_id', Integer, ForeignKey('tags.tag_id'))
+)
 
 class User(Base):
     __tablename__ = "users"
@@ -12,10 +19,11 @@ class User(Base):
     email = Column(String, unique=True, index=True)
     phone_number = Column(String)
     hashed_password = Column(String)
+    google_id = Column(String, unique=True, nullable=True)
     is_verified = Column(Boolean, default=True)
     create_at = Column(TIMESTAMP, default=datetime.utcnow)
-    carts = relationship("Cart", back_populates="user")
-    wishlist = relationship("Wishlist", back_populates="user")
+    # carts = relationship("Cart", back_populates="user")
+    # wishlist = relationship("Wishlist", back_populates="user")
     orders = relationship("Order", back_populates="user")
 
 class Product(Base):
@@ -30,6 +38,14 @@ class Product(Base):
     is_active = Column(Boolean, default=True)
     created_at = Column(TIMESTAMP, default=datetime.utcnow)
     variants = relationship("ProductVariant", back_populates="product")
+    tags = relationship("Tag", secondary=product_tags, back_populates="products")
+
+class Tag(Base):
+    __tablename__ = "tags"
+
+    tag_id = Column(Integer, primary_key=True)
+    name = Column(String, unique=True)
+    products = relationship("Product", secondary=product_tags, back_populates="tags")
 
 class ProductVariant(Base):
     __tablename__ = "product_variants"
@@ -51,7 +67,7 @@ class Cart(Base):
     cart_id = Column(Integer, primary_key=True)
     user_id = Column(Integer, ForeignKey("users.user_id", ondelete="CASCADE"))
     created_at = Column(TIMESTAMP, default=datetime.utcnow)
-    user = relationship("User", back_populates="carts")
+    # user = relationship("User", back_populates="carts")
     items = relationship("CartItem", back_populates="cart")
 
 class CartItem(Base):
@@ -71,7 +87,7 @@ class Wishlist(Base):
     wishlist_id = Column(Integer, primary_key=True)
     user_id = Column(Integer, ForeignKey("users.user_id", ondelete="CASCADE"))
     created_at = Column(TIMESTAMP, default=datetime.utcnow)
-    user = relationship("User", back_populates="wishlist")
+    # user = relationship("User", back_populates="wishlist")
     items = relationship("WishlistItem", back_populates="wishlist")
 
 class WishlistItem(Base):
@@ -127,3 +143,11 @@ class Receipt(Base):
     invoice_number = Column(String, unique=True)
     pdf_url = Column(String)
     generated_at = Column(TIMESTAMP, default=datetime.utcnow)
+
+class RecentlyViewed(Base):
+    __tablename__ = "recently_viewed"
+
+    id = Column(Integer, primary_key=True)
+    user_id = Column(Integer, ForeignKey("users.user_id", ondelete="CASCADE"))
+    product_id = Column(Integer, ForeignKey("products.product_id"))
+    viewed_at = Column(TIMESTAMP, default=datetime.utcnow)
