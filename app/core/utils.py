@@ -2,7 +2,7 @@ import hashlib
 import smtplib
 import socket
 from email.mime.text import MIMEText
-from app.config import settings
+from app.core.config import settings
 
 def hash_password(password: str) -> str:
     return hashlib.sha256(password.encode()).hexdigest()

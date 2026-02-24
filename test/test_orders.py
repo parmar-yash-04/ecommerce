@@ -143,7 +143,7 @@ def test_get_order_detail_different_user(client, test_variant, auth_headers, tes
     order_response = client.post("/checkout/place-order", json=checkout_data, headers=auth_headers)
     order_id = order_response.json()["order"]["order_id"]
     
-    from app.oauth2 import create_access_token
+    from app.core.oauth2 import create_access_token
     token2 = create_access_token(data={"user_id": test_user2.user_id})
     auth_headers2 = {"Authorization": f"Bearer {token2}"}
     

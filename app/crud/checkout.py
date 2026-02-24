@@ -1,14 +1,8 @@
 import uuid
 from datetime import datetime
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import HTTPException
 from sqlalchemy.orm import Session
-from app.database import get_db
 from app.models import Cart, CartItem, ProductVariant, Order, OrderItem, Receipt, OTPVerification
-from app.schemas import CheckoutRequest, OrderResponse, CheckoutResponse
-from app.oauth2 import get_current_user
-from app.config import settings
-
-router = APIRouter(prefix="/checkout", tags=["Checkout"])
 
 def verify_otp(db: Session, email: str, otp: str):
     rec = db.query(OTPVerification).filter(
@@ -27,30 +21,23 @@ def verify_otp(db: Session, email: str, otp: str):
     db.commit()
     return True
 
-@router.post("/place-order", response_model=CheckoutResponse)
-def place_order(
-    data: CheckoutRequest,
-    db: Session = Depends(get_db),
-    user = Depends(get_current_user)
-):
+def place_order(db: Session, user_id: int, email: str, otp: str, shipping_address: str):
 
-    if data.otp:
-        if not verify_otp(db, data.email, data.otp):
+    if otp:
+        if not verify_otp(db, email, otp):
             raise HTTPException(400, "OTP invalid or expired")
 
-    cart = db.query(Cart).filter(
-        Cart.user_id == user.user_id
-    ).first()
+    cart = db.query(Cart).filter(Cart.user_id == user_id).first()
 
     if not cart or not cart.items:
         raise HTTPException(400, "Cart is empty")
 
     order = Order(
-        user_id=user.user_id,
+        user_id=user_id,
         order_number=str(uuid.uuid4())[:8],
         order_status="placed",
         payment_status="pending",
-        shipping_address=data.shipping_address,
+        shipping_address=shipping_address,
         total_amount=0
     )
 
@@ -87,7 +74,6 @@ def place_order(
         )
 
         variant.stock_qty -= item.quantity
-
         db.add(order_item)
         total += subtotal
 
@@ -107,16 +93,10 @@ def place_order(
     db.commit()
     db.refresh(order)
 
-    return {
-        "order": order,
-        "payment_link_url": None
-    }
+    return order
 
-@router.get("/my-orders", response_model=list[OrderResponse])
-def my_orders(
-    db: Session = Depends(get_db),
-    user = Depends(get_current_user)
-):
+
+def get_user_orders(db: Session, user_id: int):
     return db.query(Order).filter(
-        Order.user_id == user.user_id
+        Order.user_id == user_id
     ).all()

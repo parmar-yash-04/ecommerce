@@ -3,15 +3,15 @@ from test.config import *
 from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from app.database import get_db, Base
+from app.db.database import get_db, Base
 from main import app
 from app.models import (
     User, Product, ProductVariant, Cart, CartItem, 
     Wishlist, WishlistItem, Order, OrderItem, 
     OTPVerification, Receipt
 )
-from app.utils import hash_password
-from app.oauth2 import create_access_token
+from app.core.utils import hash_password
+from app.core.oauth2 import create_access_token
 
 SQLALCHEMY_DATABASE_URL = "sqlite:///./test.db"
 
@@ -42,7 +42,8 @@ def client(db_session):
             pass
     
     app.dependency_overrides[get_db] = override_get_db
-    yield TestClient(app)
+    client = TestClient(app)
+    yield client
     app.dependency_overrides.clear()
 
 @pytest.fixture

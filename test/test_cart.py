@@ -109,7 +109,7 @@ def test_update_cart_quantity(client, test_variant, auth_headers):
         "quantity": 5
     }
     response = client.put("/cart/update", json=update_data, headers=auth_headers)
-    assert response.status_code == status.HTTP_201_CREATED
+    assert response.status_code == status.HTTP_200_OK
     data = response.json()
     assert data["items"][0]["quantity"] == 5
 
@@ -126,7 +126,7 @@ def test_update_cart_quantity_to_zero_removes_item(client, test_variant, auth_he
         "quantity": 0
     }
     response = client.put("/cart/update", json=update_data, headers=auth_headers)
-    assert response.status_code == status.HTTP_201_CREATED
+    assert response.status_code == status.HTTP_200_OK
     data = response.json()
     assert len(data["items"]) == 0
 
