@@ -1,0 +1,7 @@
+__pycache__
+.env
+ecomm
+test.db
+settings.json
+.env.test
+.env.prod
