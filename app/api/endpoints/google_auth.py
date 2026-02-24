@@ -17,7 +17,6 @@ GOOGLE_AUTH_URL = "https://accounts.google.com/o/oauth2/v2/auth"
 GOOGLE_TOKEN_URL = "https://oauth2.googleapis.com/token"
 GOOGLE_USERINFO_URL = "https://www.googleapis.com/oauth2/v2/userinfo"
 
-
 @router.get("/google")
 def google_login():
     params = {
@@ -30,7 +29,6 @@ def google_login():
     }
     url = f"{GOOGLE_AUTH_URL}?{urlencode(params)}"
     return {"authorization_url": url}
-
 
 @router.get("/google/callback")
 def google_callback(code: str = Query(...), db: Session = Depends(get_db)):
@@ -89,7 +87,6 @@ def google_callback(code: str = Query(...), db: Session = Depends(get_db)):
     )
 
     return RedirectResponse(url=redirect_url)
-
 
 @router.post("/google/token", response_model=Token)
 def google_token_exchange(code: str, db: Session = Depends(get_db)):

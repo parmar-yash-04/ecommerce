@@ -19,14 +19,12 @@ def add_to_wishlist(
         data.product_id
     )
 
-
 @router.get("/", response_model=WishlistResponse)
 def view_wishlist(
     db: Session = Depends(get_db),
     user = Depends(get_current_user)
 ):
     return crud_wishlist.get_wishlist(db, user.user_id)
-
 
 @router.delete("/remove/{wishlist_item_id}", status_code=status.HTTP_204_NO_CONTENT)
 def remove_from_wishlist(

@@ -19,7 +19,6 @@ def add_recently_viewed(
     )
     return {"message": "Product added to recently viewed"}
 
-
 @router.get("/")
 def get_recently_viewed(
     db: Session = Depends(get_db),

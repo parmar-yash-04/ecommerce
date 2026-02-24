@@ -20,7 +20,6 @@ def add_to_cart(
         "items": [CartItemResponse.from_db(item) for item in cart.items]
     }
 
-
 @router.get("/", response_model=CartResponse)
 def view_cart(
     db: Session = Depends(get_db),
@@ -50,7 +49,6 @@ def update_quantity(
         "cart_id": cart.cart_id,
         "items": [CartItemResponse.from_db(item) for item in cart.items]
     }
-
 
 @router.delete("/remove/{cart_item_id}", status_code=status.HTTP_204_NO_CONTENT)
 def remove_item(

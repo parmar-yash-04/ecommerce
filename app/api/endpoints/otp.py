@@ -23,7 +23,6 @@ def send_otp(
 
     return {"message": "OTP sent to your email"}
 
-
 @router.post("/verify")
 def verify_otp(
     data: OTPVerifyRequest,
