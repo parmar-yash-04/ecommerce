@@ -43,10 +43,15 @@ jobs:
 
       - name: Install dependencies
         run: |
-          python -m alembic upgrade head
           python -m pip install --upgrade pip
           pip install -r requirements.txt
           pip install pytest
+
+      - name: Run Database Migrations
+        run: |
+          alembic upgrade head
+        env:
+          DATABASE_URL: ${{ secrets.TEST_DB_URL }}
 
       - name: Wait for Postgres
         run: |
