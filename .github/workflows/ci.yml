@@ -26,7 +26,7 @@ jobs:
           --health-retries=5
 
     env:
-      DATABASE_URL: ${{ secrets.DATABASE_URL }}
+      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/testdb
       SECRET_KEY: ${{ secrets.SECRET_KEY }}
       ALGORITHM: ${{ secrets.ALGORITHM }}
       ACCESS_TOKEN_EXPIRE_MINUTES: ${{ secrets.ACCESS_TOKEN_EXPIRE_MINUTES }}
@@ -47,12 +47,6 @@ jobs:
           pip install -r requirements.txt
           pip install pytest
 
-      - name: Run Database Migrations
-        run: |
-          alembic upgrade head
-        env:
-          DATABASE_URL: ${{ secrets.TEST_DB_URL }}
-
       - name: Wait for Postgres
         run: |
           for i in {1..10}; do
@@ -60,6 +54,18 @@ jobs:
             echo "Waiting for postgres..."
             sleep 3
           done
+
+      - name: Verify alembic.ini exists
+        run: |
+          if [ ! -f alembic.ini ]; then
+            echo "Error: alembic.ini not found"
+            exit 1
+          fi
+          cat alembic.ini
+
+      - name: Run Database Migrations
+        run: |
+          alembic upgrade head
 
       - name: Run Tests
         run: pytest -v
