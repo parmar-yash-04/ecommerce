@@ -6,7 +6,7 @@ Create Date: 2026-02-13 19:26:53.610786
 
 """
 from typing import Sequence, Union
-
+from swqlalchemy import inspect
 from alembic import op
 import sqlalchemy as sa
 
@@ -18,11 +18,27 @@ branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
 
 
-def upgrade() -> None:
-    op.drop_constraint(op.f('orders_user_id_fkey'), 'orders', type_='foreignkey')
-    op.create_foreign_key(None, 'orders', 'users', ['user_id'], ['user_id'], ondelete='CASCADE')
-    op.drop_constraint(op.f('wishlists_user_id_fkey'), 'wishlists', type_='foreignkey')
-    op.create_foreign_key(None, 'wishlists', 'users', ['user_id'], ['user_id'], ondelete='CASCADE')
+def upgrade():
+    bind = op.get_bind()
+    inspector = inspect(bind)
+
+    # Drop & recreate safely
+    try:
+        op.drop_constraint('orders_user_id_fkey', 'orders', type_='foreignkey')
+    except:
+        pass
+
+    try:
+        op.create_foreign_key(
+            None,
+            'orders',
+            'users',
+            ['user_id'],
+            ['user_id'],
+            ondelete='CASCADE'
+        )
+    except:
+        pass
 
 
 def downgrade() -> None:
