@@ -82,7 +82,7 @@ def google_callback(code: str = Query(...), db: Session = Depends(get_db)):
     encoded_user_data = urllib.parse.quote(json.dumps(user_data))
     
     redirect_url = (
-        f"http://localhost:5173/login?"
+        f"https://zealous-coast-001e51800.azurestaticapps.net/login?"
         f"access_token={jwt_token}&user_data={encoded_user_data}"
     )
 
