@@ -5,17 +5,16 @@ Revises: 66e02f4f7834
 Create Date: 2026-02-14 10:53:48.471003
 
 """
-from typing import Sequence, Union
-
 from alembic import op
 import sqlalchemy as sa
+from sqlalchemy import inspect
 
 
 # revision identifiers, used by Alembic.
-revision: str = '5263539d78df'
-down_revision: Union[str, None] = '66e02f4f7834'
-branch_labels: Union[str, Sequence[str], None] = None
-depends_on: Union[str, Sequence[str], None] = None
+revision = '5263539d78df'
+down_revision = '66e02f4f7834'
+branch_labels = None
+depends_on = None
 
 
 def upgrade():
@@ -29,6 +28,7 @@ def upgrade():
             "product_variants",
             sa.Column("image_url", sa.String(), nullable=True)
         )
+
 
 def downgrade():
     bind = op.get_bind()
