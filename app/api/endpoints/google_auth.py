@@ -86,7 +86,7 @@ def google_callback(code: str = Query(...), db: Session = Depends(get_db)):
         f"access_token={jwt_token}&user_data={encoded_user_data}"
     )
 
-    return RedirectResponse(url=redirect_url)
+    return RedirectResponse(url=redirect_url, status_code=302)
 
 @router.post("/google/token", response_model=Token)
 def google_token_exchange(code: str, db: Session = Depends(get_db)):
