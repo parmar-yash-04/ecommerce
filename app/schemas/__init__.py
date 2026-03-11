@@ -7,3 +7,4 @@ from .order import *
 from .checkout import *
 from .otp import *
 from .tag import *
+from .chatbot import *

@@ -1,5 +1,5 @@
 from fastapi import APIRouter
-from app.api.endpoints import tag, users, auth, cart, checkout, google_auth, orders, otp, products, wishlist, recentview
+from app.api.endpoints import tag, users, auth, cart, checkout, google_auth, orders, otp, products, wishlist, recentview, chatbot
 
 api_router = APIRouter()
 
@@ -14,3 +14,4 @@ api_router.include_router(orders.router)
 api_router.include_router(google_auth.router)
 api_router.include_router(recentview.router)
 api_router.include_router(tag.router)
+api_router.include_router(chatbot.router)

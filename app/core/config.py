@@ -51,7 +51,8 @@ class Settings(BaseSettings):
     google_client_id: str = ""
     google_client_secret: str = ""
     google_redirect_uri: str = ""
+    COHERE_API_KEY: str = ""
+    GROQ_API_KEY: str = ""
     env: str = ENV
-
 
 settings = Settings()
