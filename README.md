@@ -127,6 +127,11 @@ Phone Shop/
 | POST | `/api/chatbot/sync-products` | Sync products to vector DB |
 | GET | `/api/chatbot/status` | Chatbot status |
 
+<img width="1899" height="927" alt="Screenshot 2026-04-05 185222" src="https://github.com/user-attachments/assets/6da58998-ca78-449d-9c5a-8596692110cf" />
+<img width="1896" height="925" alt="Screenshot 2026-04-05 185242" src="https://github.com/user-attachments/assets/7e944bcf-e6d5-42e4-97be-961b97de69aa" />
+<img width="1898" height="923" alt="Screenshot 2026-04-05 185257" src="https://github.com/user-attachments/assets/a603c045-e4ed-42cc-85e5-4aa71dea892f" />
+<img width="1897" height="925" alt="Screenshot 2026-04-05 185311" src="https://github.com/user-attachments/assets/f7d2e04a-76d0-4953-9db4-b707c52f4072" />
+
 ---
 
 ## 🧪 Testing
