@@ -1,4 +1,4 @@
-![Phone Shop Banner](https://via.placeholder.com/1200x400/2563eb/ffffff?text=Phone+Shop+API)
+![Phone Shop Banner]<img width="1897" height="925" alt="Screenshot 2026-04-05 175636" src="https://github.com/user-attachments/assets/d4c41652-9df2-4201-b139-dcbe6177561f" />
 
 <div align="center">
 
@@ -322,8 +322,8 @@ This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) 
 ## 👨‍💻 Author
 
 **Your Name**
-- GitHub: [@yourusername](https://github.com/yourusername)
-- LinkedIn: [Your LinkedIn](https://linkedin.com/in/yourprofile)
+- GitHub: [@Parmar Yash](https://github.com/parmar-yash-04)
+- LinkedIn: [Parmar Yash]([https://linkedin.com/in/yourprofile](https://www.linkedin.com/in/yash-parmar-yash04/))
 
 ---
 
