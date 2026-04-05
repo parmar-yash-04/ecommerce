@@ -252,7 +252,7 @@ def chat_with_products(request: ChatRequest, db: Session = Depends(get_db)):
 
     if not raw_results:
         return {
-            "answer": "I couldn't find any products in our database. Please try again or browse manually.",
+            "answer": "I couldn't find any products in our database.",
             "products": []
         }
 
@@ -265,7 +265,7 @@ def chat_with_products(request: ChatRequest, db: Session = Depends(get_db)):
 
     if not product_data:
         return {
-            "answer": "No products found. Please sync products first via /sync-products.",
+            "answer": "No products found.",
             "products": []
         }
 
