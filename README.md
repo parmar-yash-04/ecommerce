@@ -223,6 +223,8 @@ The project includes an AI-powered chatbot that uses:
 4. Groq LLM generates human-readable recommendations
 5. Supports budget filtering, brand preferences, and more
 
+<img width="1901" height="929" alt="Screenshot 2026-04-05 181817" src="https://github.com/user-attachments/assets/361b8608-4757-4544-84f6-488d6383e537" />
+
 ---
 
 ## 📊 Database Schema
@@ -294,12 +296,14 @@ The project includes an AI-powered chatbot that uses:
 - SQL injection prevention (via SQLAlchemy)
 - Input validation with Pydantic
 
+<img width="1919" height="926" alt="Screenshot 2026-04-05 182012" src="https://github.com/user-attachments/assets/ff7df3c5-d625-41b4-9471-9545143f93d9" />
+
 ---
 
 ## 🚀 Deployment
 
 ### Render
-The project is configured for deployment on [Render](https://render.com/).
+The project is configured for deployment on [Render](https://ecommerce-api-gr8a.onrender.com).
 
 ```yaml
 # render.yaml
@@ -323,7 +327,7 @@ This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) 
 
 **Your Name**
 - GitHub: [@Parmar Yash](https://github.com/parmar-yash-04)
-- LinkedIn: [Parmar Yash]([https://linkedin.com/in/yourprofile](https://www.linkedin.com/in/yash-parmar-yash04/))
+- LinkedIn: [Parmar Yash](https://www.linkedin.com/in/yash-parmar-yash04/)
 
 ---
 
