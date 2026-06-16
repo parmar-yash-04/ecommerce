@@ -83,8 +83,7 @@ def google_callback(code: str = Query(...), db: Session = Depends(get_db)):
     
     frontend_url = "http://localhost:5173" if settings.env == "dev" else "https://zealous-coast-001e51800.2.azurestaticapps.net"
     redirect_url = (
-        f"{frontend_url}/login?"
-        f"access_token={jwt_token}&user_data={encoded_user_data}"
+        f"{frontend_url}/?access_token={jwt_token}&user_data={encoded_user_data}"
     )
     return RedirectResponse(url=redirect_url)
 
