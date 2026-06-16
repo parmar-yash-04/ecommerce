@@ -30,21 +30,9 @@ def get_groq_client():
     return Groq(api_key=settings.GROQ_API_KEY)
 
 def get_vector_db_connection():
-    vector_db_used = (
-        settings.used
-        or settings.chatbot_vector_db_used
-        or "local"
-    ).strip().lower()
-
-    if vector_db_used in {"prod", "production"}:
+    if settings.env == "production":
         prod_url = settings.chatbot_vector_db_prod_url or settings.database_url
         return psycopg2.connect(prod_url)
-
-    if vector_db_used != "local":
-        raise HTTPException(
-            status_code=500,
-            detail="Invalid chatbot vector DB mode. Use USED=local or USED=prod."
-        )
 
     return psycopg2.connect(
         host=settings.chatbot_vector_db_local_host,
