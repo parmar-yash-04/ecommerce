@@ -13,19 +13,46 @@ import re
 
 router = APIRouter(prefix="/api/chatbot", tags=["chatbot"])
 
-cohere_client = cohere.Client(settings.COHERE_API_KEY)
-groq_client = Groq(api_key=settings.GROQ_API_KEY)
+def get_cohere_client():
+    if not settings.COHERE_API_KEY:
+        raise HTTPException(
+            status_code=500,
+            detail="COHERE_API_KEY is not configured."
+        )
+    return cohere.Client(settings.COHERE_API_KEY)
 
-VECTOR_DB_CONFIG = {
-    "host": "localhost",
-    "database": "ragdb",
-    "user": "postgres",
-    "password": "99240",
-    "port": 5432
-}
+def get_groq_client():
+    if not settings.GROQ_API_KEY:
+        raise HTTPException(
+            status_code=500,
+            detail="GROQ_API_KEY is not configured."
+        )
+    return Groq(api_key=settings.GROQ_API_KEY)
 
 def get_vector_db_connection():
-    return psycopg2.connect(**VECTOR_DB_CONFIG)
+    vector_db_used = (
+        settings.used
+        or settings.chatbot_vector_db_used
+        or "local"
+    ).strip().lower()
+
+    if vector_db_used in {"prod", "production"}:
+        prod_url = settings.chatbot_vector_db_prod_url or settings.database_url
+        return psycopg2.connect(prod_url)
+
+    if vector_db_used != "local":
+        raise HTTPException(
+            status_code=500,
+            detail="Invalid chatbot vector DB mode. Use USED=local or USED=prod."
+        )
+
+    return psycopg2.connect(
+        host=settings.chatbot_vector_db_local_host,
+        database=settings.chatbot_vector_db_local_database,
+        user=settings.chatbot_vector_db_local_user,
+        password=settings.chatbot_vector_db_local_password,
+        port=settings.chatbot_vector_db_local_port,
+    )
 
 def ensure_vector_table():
     conn = get_vector_db_connection()
@@ -45,7 +72,7 @@ def ensure_vector_table():
     conn.close()
 
 def get_embeddings_batch(texts):
-    response = cohere_client.embed(
+    response = get_cohere_client().embed(
         texts=texts,
         model="embed-english-v3.0",
         input_type="search_document"
@@ -53,7 +80,7 @@ def get_embeddings_batch(texts):
     return [np.array(e) for e in list(response.embeddings)]
 
 def get_query_embedding(text):
-    response = cohere_client.embed(
+    response = get_cohere_client().embed(
         texts=[text],
         model="embed-english-v3.0",
         input_type="search_query"
@@ -233,7 +260,7 @@ Instructions:
 - After each product, add a view button in this format: [VIEW_PRODUCT:variant_id]
 """
 
-    response = groq_client.chat.completions.create(
+    response = get_groq_client().chat.completions.create(
         model="llama-3.3-70b-versatile",
         messages=[{"role": "user", "content": prompt}],
         temperature=0.3,
