@@ -9,7 +9,7 @@ app = FastAPI()
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["https://zealous-coast-001e51800.2.azurestaticapps.net","http://localhost:5173"],
+    allow_origins=["https://ecommerce-frontend-snowy-two.vercel.app","http://localhost:5173"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
