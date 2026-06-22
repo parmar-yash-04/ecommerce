@@ -23,6 +23,23 @@ def list_products(
 ):
     return crud_product.list_products(db, page, size)
 
+@router.get("/search")
+def search_products(
+    q: str = Query(..., min_length=1),
+    page: int = Query(1, ge=1),
+    size: int = Query(10, le=50),
+    db: Session = Depends(get_db)
+):
+    return crud_product.search_products(db, q, page, size)
+
+@router.get("/suggestions")
+def search_suggestions(
+    q: str = Query("", min_length=0),
+    limit: int = Query(8, ge=1, le=20),
+    db: Session = Depends(get_db)
+):
+    return crud_product.get_search_suggestions(db, q, limit)
+
 @router.get("/{product_id}", response_model=ProductResponse)
 def get_product(product_id: int, db: Session = Depends(get_db)):
     return crud_product.get_product_by_id(db, product_id)
