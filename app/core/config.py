@@ -41,6 +41,7 @@ class Settings(BaseSettings):
     chatbot_vector_db_local_password: str = ""
     chatbot_vector_db_local_port: int = 5432
     chatbot_vector_db_prod_url: str = ""
+    cors: str = ""
     env: str = ENV
 
 settings = Settings()

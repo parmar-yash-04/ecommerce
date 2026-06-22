@@ -26,3 +26,11 @@ def create_user(db: Session, user_data):
     db.commit()
     db.refresh(new_user)
     return new_user
+
+def update_password(db: Session, email: str, new_password: str):
+    user = get_user_by_email(db, email)
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    user.hashed_password = hash_password(new_password)
+    db.commit()
+    return True
