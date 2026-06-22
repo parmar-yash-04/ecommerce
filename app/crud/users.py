@@ -18,7 +18,8 @@ def create_user(db: Session, user_data):
         email=user_data.email,
         username=user_data.username,
         phone_number=user_data.phone_number,
-        hashed_password=hashed_pw
+        hashed_password=hashed_pw,
+        terms_accepted=user_data.terms_accepted
     )
 
     db.add(new_user)

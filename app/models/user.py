@@ -16,3 +16,4 @@ class User(Base):
     is_verified = Column(Boolean, default=True)
     create_at = Column(TIMESTAMP, default=datetime.utcnow)
     orders = relationship("Order", back_populates="user")
+    terms_accepted = Column(Boolean, default=False)

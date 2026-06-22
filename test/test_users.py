@@ -6,7 +6,8 @@ def test_create_user_success(client):
         "username": "newuser",
         "email": "newuser@example.com",
         "phone_number": "5551234567",
-        "password": "password123"
+        "password": "password123",
+        "terms_accepted": True
     }
     response = client.post("/users/create", json=user_data)
     assert response.status_code == status.HTTP_201_CREATED
