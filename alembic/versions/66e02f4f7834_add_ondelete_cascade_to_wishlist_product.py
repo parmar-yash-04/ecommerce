@@ -22,23 +22,18 @@ def upgrade():
     bind = op.get_bind()
     inspector = inspect(bind)
 
-    # Drop & recreate safely
-    try:
+    fks = [fk["name"] for fk in inspector.get_foreign_keys("orders")]
+    if "orders_user_id_fkey" in fks:
         op.drop_constraint('orders_user_id_fkey', 'orders', type_='foreignkey')
-    except:
-        pass
 
-    try:
-        op.create_foreign_key(
-            None,
-            'orders',
-            'users',
-            ['user_id'],
-            ['user_id'],
-            ondelete='CASCADE'
-        )
-    except:
-        pass
+    op.create_foreign_key(
+        'orders_user_id_fkey',
+        'orders',
+        'users',
+        ['user_id'],
+        ['user_id'],
+        ondelete='CASCADE'
+    )
 
 
 def downgrade() -> None:
