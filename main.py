@@ -8,9 +8,19 @@ Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
 
+
+def _allowed_origins(raw: str) -> list[str]:
+    origins = []
+    for candidate in raw.split(","):
+        origin = candidate.strip().rstrip("/")
+        if origin and origin not in origins:
+            origins.append(origin)
+    return origins
+
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[origin.strip() for origin in settings.cors.split(",") if origin.strip()],
+    allow_origins=_allowed_origins(settings.cors),
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
