@@ -21,6 +21,9 @@ depends_on: Union[str, Sequence[str], None] = None
 def upgrade() -> None:
     bind = op.get_bind()
     inspector = inspect(bind)
+    if not inspector.has_table("users"):
+        return
+
     columns = [col["name"] for col in inspector.get_columns("users")]
 
     if "google_id" not in columns:

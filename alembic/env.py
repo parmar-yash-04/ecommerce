@@ -60,6 +60,13 @@ def run_migrations_online() -> None:
     """
     connectable = create_engine(settings.database_url, poolclass=pool.NullPool)
 
+    # The revision chain is ALTER/no-op only: no revision creates the base
+    # tables, they come from the models (the app also calls create_all at
+    # startup). Migrations run before the app boots, so on a fresh database
+    # the first revision would hit a missing table. Ensure the schema exists
+    # first; create_all is idempotent and leaves existing tables untouched.
+    Base.metadata.create_all(bind=connectable)
+
     with connectable.connect() as connection:
         context.configure(
         connection=connection,

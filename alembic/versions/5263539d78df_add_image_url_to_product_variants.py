@@ -19,6 +19,9 @@ def upgrade():
     bind = op.get_bind()
     inspector = inspect(bind)
 
+    if not inspector.has_table("product_variants"):
+        return
+
     columns = [col["name"] for col in inspector.get_columns("product_variants")]
 
     if "image_url" not in columns:
@@ -31,6 +34,9 @@ def upgrade():
 def downgrade():
     bind = op.get_bind()
     inspector = inspect(bind)
+
+    if not inspector.has_table("product_variants"):
+        return
 
     columns = [col["name"] for col in inspector.get_columns("product_variants")]
 

@@ -22,9 +22,20 @@ def upgrade():
     bind = op.get_bind()
     inspector = inspect(bind)
 
-    fks = [fk["name"] for fk in inspector.get_foreign_keys("orders")]
-    if "orders_user_id_fkey" in fks:
-        op.drop_constraint('orders_user_id_fkey', 'orders', type_='foreignkey')
+    if not inspector.has_table("orders"):
+        return
+
+    user_fks = [
+        fk
+        for fk in inspector.get_foreign_keys("orders")
+        if fk["referred_table"] == "users"
+        and fk.get("constrained_columns") == ["user_id"]
+    ]
+    for fk in user_fks:
+        if (fk.get("options") or {}).get("ondelete", "").upper() == "CASCADE":
+            return
+        op.drop_constraint(fk["name"], 'orders', type_='foreignkey')
+        break
 
     op.create_foreign_key(
         'orders_user_id_fkey',
