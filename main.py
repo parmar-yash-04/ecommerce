@@ -8,10 +8,18 @@ Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
 
+BASE_ORIGINS = (
+    "http://localhost:5173",
+    "https://ecommerce-frontend-snowy-two.vercel.app",
+    "https://ecommerce-frontend-kkayklynr-yashs-projects-2f6e6ad4.vercel.app",
+    "https://ecommercenexcart.netlify.app",
+    "https://main--ecommercenexcart.netlify.app",
+)
+
 
 def _allowed_origins(raw: str) -> list[str]:
     origins = []
-    for candidate in raw.split(","):
+    for candidate in list(raw.split(",")) + list(BASE_ORIGINS):
         origin = candidate.strip().rstrip("/")
         if origin and origin not in origins:
             origins.append(origin)
