@@ -54,6 +54,9 @@ services:
       - key: ENV
         value: production
 
+      - key: CORS
+        value: "https://ecommerce-frontend-snowy-two.vercel.app,http://localhost:5173,https://ecommerce-frontend-kkayklynr-yashs-projects-2f6e6ad4.vercel.app,https://ecommercenexcart.netlify.app,https://main--ecommercenexcart.netlify.app"
+
 databases:
   - name: ecommerce-db
     plan: free
